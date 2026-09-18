@@ -1,0 +1,10 @@
+Flask==3.0.0
+Flask-CORS==4.0.0
+Flask-SQLAlchemy
+SQLAlchemy
+ultralytics==8.3.0
+opencv-python==4.9.0.80
+numpy==1.26.4
+pandas==2.2.0
+pillow==10.2.0
+werkzeug==3.0.1

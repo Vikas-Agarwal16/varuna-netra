@@ -1,0 +1,49 @@
+{
+  "system": "AI-Powered Automated Underwater Marine Debris Detector (SIH PS-57)",
+  "timestamp": "2026-09-09 15:10:01",
+  "total_anomalies_detected": 2,
+  "anomalies": [
+    {
+      "anomaly_id": "ANO-001",
+      "classification": "bottle",
+      "confidence_score": "81.11%",
+      "hazard_level": "HIGH (Navigational / Ecological Hazard)",
+      "location": {
+        "latitude": 18.943762,
+        "longitude": 72.836001
+      },
+      "estimated_dimensions_m": {
+        "width": 2.92,
+        "length": 11.56,
+        "area_sq_m": 33.76
+      },
+      "bounding_box_pixels": [
+        147,
+        225,
+        175,
+        336
+      ]
+    },
+    {
+      "anomaly_id": "ANO-002",
+      "classification": "wall",
+      "confidence_score": "78.45%",
+      "hazard_level": "LOW (Monitor)",
+      "location": {
+        "latitude": 18.943934,
+        "longitude": 72.835988
+      },
+      "estimated_dimensions_m": {
+        "width": 30.73,
+        "length": 16.25,
+        "area_sq_m": 499.36
+      },
+      "bounding_box_pixels": [
+        0,
+        19,
+        295,
+        175
+      ]
+    }
+  ]
+}

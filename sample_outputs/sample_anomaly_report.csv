@@ -1,0 +1,3 @@
+Anomaly ID,Class,Confidence,Hazard Level,Latitude,Longitude,Width(m),Length(m),Area(m2)
+ANO-001,bottle,81.11%,HIGH (Navigational / Ecological Hazard),18.943762,72.836001,2.92,11.56,33.76
+ANO-002,wall,78.45%,LOW (Monitor),18.943934,72.835988,30.73,16.25,499.36

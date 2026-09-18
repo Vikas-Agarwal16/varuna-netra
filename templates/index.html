@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VARUN NETRA — Underwater Intelligence</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+<header class="topbar">
+<div class="wrap h-full flex items-center justify-between">
+<div class="brand"><button class="btn mobilemenu" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button><div class="brandmark"><i class="fa-solid fa-water text-white"></i></div><div><div class="heading font-bold tracking-wide">VARUN NETRA</div><div class="text-[9px] text-slate-500 uppercase tracking-[.15em]">Underwater Intelligence System</div></div></div>
+<div class="flex items-center gap-3"><div class="online px-3 py-1.5 rounded-full text-[9px] font-black flex gap-2 items-center"><span class="dot"></span><span id="engineStatus">AI ENGINE ONLINE</span></div><button class="btn" onclick="toggleNotifications()"><i class="fa-solid fa-bell"></i> <span id="notifCount">0</span></button></div>
+</div>
+</header>
+
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="navgroup">COMMAND</div>
+<button class="navbtn active" data-page="overview"><i class="fa-solid fa-gauge-high"></i><span class="navtext"> Command Center</span></button>
+<button class="navbtn" data-page="scan"><i class="fa-solid fa-satellite-dish"></i><span class="navtext"> New Sonar Scan</span></button>
+<div class="navgroup">INTELLIGENCE</div>
+<button class="navbtn" data-page="history"><i class="fa-solid fa-folder-open"></i><span class="navtext"> Survey History</span></button>
+<button class="navbtn" data-page="investigation"><i class="fa-solid fa-microscope"></i><span class="navtext"> Investigation</span></button>
+<button class="navbtn" data-page="map"><i class="fa-solid fa-map-location-dot"></i><span class="navtext"> Intelligence Map</span></button>
+<button class="navbtn" data-page="analytics"><i class="fa-solid fa-chart-line"></i><span class="navtext"> Analytics</span></button>
+<div class="navgroup">SYSTEM</div>
+<button class="navbtn" data-page="reports"><i class="fa-solid fa-file-lines"></i><span class="navtext"> Reports</span></button>
+</aside>
+
+<main class="main">
+<section id="overview" class="page active">
+<div class="hero mb-4"><div class="eyebrow">SIH 2026 · PS-57 · UNDERWATER INTELLIGENCE</div><h1 class="heading font-black">Sonar intelligence,<br><span style="color:#7defff">built for action.</span></h1><p>Analyze side-scan sonar imagery, detect marine debris, calculate geospatial positions, prioritize hazards, review AI findings and track anomaly hotspots.</p><div class="flex flex-wrap gap-2 mt-5"><button class="btn primary" onclick="go('scan')"><i class="fa-solid fa-radar mr-2"></i> New sonar scan</button><button class="btn" onclick="go('map')"><i class="fa-solid fa-map-location-dot mr-2"></i> View intelligence map</button></div></div>
+<div class="cards mb-4"><div class="metric"><div class="small">Total Surveys</div><div class="num" id="dSurveys">—</div></div><div class="metric"><div class="small">Total Anomalies</div><div class="num" id="dAnomalies">—</div></div><div class="metric"><div class="small">Avg Confidence</div><div class="num" id="dConfidence">—</div></div><div class="metric"><div class="small">Critical</div><div class="num" id="dCritical">—</div></div></div>
+<div class="grid2"><div class="panel"><div class="paneltitle"><div><div class="sectionlabel">Detection trend</div><h3 class="heading">Operational activity</h3></div><span class="muted text-xs">SQLite</span></div><canvas id="trendChart" height="115"></canvas></div><div class="panel"><div class="paneltitle"><div><div class="sectionlabel">Recent alerts</div><h3 class="heading">Anomaly feed</h3></div></div><div id="recentFeed"></div></div></div>
+</section>
+
+<section id="scan" class="page">
+<div class="mb-4"><div class="eyebrow">SONAR ACQUISITION</div><h2 class="heading text-3xl font-black mt-2">AI anomaly detection</h2><p class="muted text-sm mt-1">Select or drop a sonar image. Scanning starts automatically and uses the same integrated scan animation throughout inference.</p></div>
+<div id="scanWorkspace" class="panel">
+<div id="scanFormPanel">
+<div class="formgrid mb-4">
+<div class="field"><label>Survey name</label><input class="input" id="surveyName" placeholder="Optional survey name"></div>
+<div class="field"><label>Sonar range (m)</label><input class="input" id="range" value="50" type="number" min="1"></div>
+<div class="field"><label>Latitude</label><input class="input" id="lat" value="18.9438" type="number" step="0.000001"></div>
+<div class="field"><label>Longitude</label><input class="input" id="lon" value="72.8360" type="number" step="0.000001"></div>
+<div class="field"><label>Confidence threshold: <span id="confLabel">40%</span></label><input id="confidence" type="range" min="5" max="95" value="40" style="width:100%" oninput="confLabel.textContent=this.value+'%'"></div>
+</div>
+
+<input id="fileInput" type="file" accept=".png,.jpg,.jpeg,.bmp,.tiff,.tif,.webp" hidden>
+<div id="drop" class="drop">
+<div class="drop-content" onclick="fileInput.click()">
+<i class="fa-solid fa-cloud-arrow-up text-4xl text-cyan-300 mb-3"></i>
+<h3 class="font-bold">Drop sonar image here</h3>
+<p class="muted text-sm mt-1">PNG, JPG, JPEG, BMP, TIFF, WEBP · Max 32 MB</p>
+<div id="fileName" class="text-cyan-300 text-xs mt-3"></div>
+<div class="text-[11px] text-cyan-400/70 mt-4"><i class="fa-solid fa-bolt mr-1"></i> Detection starts automatically after upload</div>
+</div>
+</div>
+</div>
+
+<div id="integratedScanner" class="integrated-scanner scan-loading">
+<div class="scan-visual">
+<div class="scan-grid"></div><div class="scan-sweep-ring"></div><div class="scan-pulse"></div><div class="scan-line"></div>
+<div class="scan-dot d1"></div><div class="scan-dot d2"></div><div class="scan-dot d3"></div>
+<i class="fa-solid fa-satellite-dish scan-icon"></i>
+</div>
+<div class="eyebrow">SONAR SCAN · INFERENCE RUNNING</div>
+<h3 class="heading text-2xl font-black mt-2" id="scanStage">Acquiring sonar frame</h3>
+<p class="muted text-sm mt-2" id="scanMessage">Reading side-scan imagery...</p>
+<div class="scan-progress"><div id="scanProgress" class="scan-progress-fill"></div></div>
+<div class="scan-steps"><span id="step1" class="scan-step active">01 Acquire</span><span id="step2" class="scan-step">02 Enhance</span><span id="step3" class="scan-step">03 Detect</span><span id="step4" class="scan-step">04 Geolocate</span><span id="step5" class="scan-step">05 Report</span></div>
+</div>
+
+<div id="scanResult" class="hidden mt-4">
+<div class="result-header mb-4"><div><div class="eyebrow">SCAN COMPLETE</div><h2 class="heading text-2xl font-black mt-1">Detection intelligence</h2></div><button class="btn primary" onclick="newScan()"><i class="fa-solid fa-rotate mr-2"></i> New Scan</button></div>
+<div class="cards mb-4"><div class="metric"><div class="small">Detections</div><div class="num" id="rTotal">0</div></div><div class="metric"><div class="small">Critical</div><div class="num" id="rCritical">0</div></div><div class="metric"><div class="small">Avg Confidence</div><div class="num" id="rConf">0%</div></div><div class="metric"><div class="small">Area</div><div class="num" id="rArea">0 m²</div></div></div>
+<div class="grid2"><div class="panel"><div class="paneltitle"><div><div class="sectionlabel">Source frame</div><h3 class="heading">Original sonar</h3></div><span class="badge">RAW</span></div><img id="rawImg" class="resultimg mt-3"></div><div class="panel"><div class="paneltitle"><div><div class="sectionlabel">AI output</div><h3 class="heading">Annotated detections</h3></div><span class="badge low">ANALYZED</span></div><img id="resultImg" class="resultimg mt-3"></div></div>
+<div class="panel mt-4"><div class="paneltitle"><div><div class="sectionlabel">Object intelligence</div><h3 class="heading">Prioritized anomalies</h3></div><span id="resultCount" class="muted text-xs">0 objects</span></div><div id="resultList" class="mt-2"></div></div>
+<div class="panel mt-4"><div class="paneltitle"><div><div class="sectionlabel">Geospatial intelligence</div><h3 class="heading">Detection coordinates & hotspots</h3></div></div><div id="resultMap" class="map"></div><div id="hotspotSummary" class="mt-3"></div></div>
+<div class="flex flex-wrap gap-2 mt-4"><button class="btn primary" onclick="exportCurrent('json')">JSON</button><button class="btn" onclick="exportCurrent('csv')">CSV</button><button class="btn" onclick="go('investigation')">Review anomalies</button><button class="btn" onclick="go('history')">Open history</button></div>
+</div>
+</div>
+</section>
+
+<section id="history" class="page">
+<div class="flex flex-wrap justify-between items-end gap-3 mb-4"><div><div class="eyebrow">SURVEY HISTORY</div><h2 class="heading text-3xl font-black mt-2">Survey archive</h2></div><div class="flex gap-2"><input id="historySearch" class="input" style="width:240px" placeholder="Search surveys..." oninput="loadHistory()"><button class="btn" onclick="loadHistory()"><i class="fa-solid fa-rotate"></i></button></div></div>
+<div class="panel overflow-auto"><table class="table"><thead><tr><th>ID</th><th>Survey</th><th>Date</th><th>Detections</th><th>Critical</th><th>Confidence</th><th>Status</th><th>Actions</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+<div class="panel mt-4"><div class="paneltitle"><div><div class="sectionlabel">Survey comparison</div><h3 class="heading">Before vs after</h3></div></div><div class="grid2"><select class="input" id="compareA"></select><select class="input" id="compareB"></select></div><button class="btn primary mt-3" onclick="compareSurveys()">Compare surveys</button><div id="compareResult" class="mt-4"></div></div>
+</section>
+
+<section id="investigation" class="page">
+<div class="mb-4"><div class="eyebrow">HUMAN-IN-THE-LOOP</div><h2 class="heading text-3xl font-black mt-2">Anomaly investigation</h2><p class="muted text-sm mt-1">Review AI detections and inspect explainability, priority and spatial history.</p></div>
+<div class="panel overflow-auto"><table class="table"><thead><tr><th>Anomaly</th><th>Class</th><th>Confidence</th><th>Priority</th><th>Hazard</th><th>Location</th><th>Review</th><th>Action</th></tr></thead><tbody id="investigationBody"></tbody></table></div>
+</section>
+
+<section id="map" class="page">
+<div class="flex flex-wrap justify-between items-end gap-3 mb-4"><div><div class="eyebrow">GEOSPATIAL INTELLIGENCE</div><h2 class="heading text-3xl font-black mt-2">Anomaly map</h2></div><div class="switch"><button class="btn active" onclick="mapMode(this,'ALL')">ALL</button><button class="btn" onclick="mapMode(this,'CRITICAL')">CRITICAL</button><button class="btn" onclick="mapMode(this,'HIGH')">HIGH</button><button class="btn" onclick="mapMode(this,'MEDIUM')">MEDIUM</button><button class="btn" onclick="mapMode(this,'LOW')">LOW</button></div></div>
+<div class="panel"><div id="intelMap" class="map"></div></div>
+<div class="grid3 mt-4"><div class="field"><label>Classification</label><select class="input" id="mapClass"><option>ALL</option></select></div><div class="field"><label>Review status</label><select class="input" id="mapReview"><option>ALL</option><option>pending</option><option>approved</option><option>rejected</option></select></div><div class="field"><label>Minimum confidence</label><input class="input" id="mapConf" type="number" value="0" min="0" max="100"></div></div><button class="btn primary mt-3" onclick="loadMap()">Apply filters</button>
+<div class="panel mt-4"><div class="paneltitle"><div><div class="sectionlabel">Density analysis</div><h3 class="heading">Anomaly hotspots</h3></div></div><div id="hotspots" class="grid3"></div></div>
+</section>
+
+<section id="analytics" class="page">
+<div class="mb-4"><div class="eyebrow">ANALYTICS</div><h2 class="heading text-3xl font-black mt-2">Marine debris intelligence</h2></div>
+<div class="cards mb-4"><div class="metric"><div class="small">Objects</div><div class="num" id="aTotal">—</div></div><div class="metric"><div class="small">Confidence</div><div class="num" id="aConf">—</div></div><div class="metric"><div class="small">Mapped area</div><div class="num" id="aArea">—</div></div><div class="metric"><div class="small">Pending review</div><div class="num" id="aPending">—</div></div></div>
+<div class="grid2"><div class="panel"><div class="sectionlabel">Hazard distribution</div><canvas id="hazardChart"></canvas></div><div class="panel"><div class="sectionlabel">Review status</div><canvas id="reviewChart"></canvas></div></div><div class="panel mt-4"><div class="sectionlabel">Object classes</div><canvas id="classChart" height="110"></canvas></div>
+</section>
+
+<section id="reports" class="page">
+<div class="mb-4"><div class="eyebrow">REPORT CENTER</div><h2 class="heading text-3xl font-black mt-2">Mission reports</h2><p class="muted text-sm mt-1">Export structured anomaly data for downstream analysis.</p></div>
+<div class="grid2"><div class="panel"><i class="fa-solid fa-file-code text-cyan-300 text-xl"></i><h3 class="heading font-bold mt-3">JSON report</h3><p class="muted text-xs my-3">Machine-readable detection register with priority and explainability fields.</p><button class="btn primary" onclick="exportCurrent('json')">Export JSON</button></div><div class="panel"><i class="fa-solid fa-file-csv text-cyan-300 text-xl"></i><h3 class="heading font-bold mt-3">CSV register</h3><p class="muted text-xs my-3">Operational anomaly table for GIS or spreadsheet workflows.</p><button class="btn primary" onclick="exportCurrent('csv')">Export CSV</button></div></div>
+<div class="panel mt-4"><div class="sectionlabel">Mission briefing</div><h2 class="heading text-2xl font-black mt-2">VARUN NETRA — Underwater Intelligence Report</h2><div id="reportContent" class="mt-4 muted">Run a scan or select a survey to populate the report.</div></div>
+</section>
+</main></div>
+
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox"><div class="flex justify-between items-center"><h3 id="modalTitle" class="heading text-xl font-black"></h3><button class="btn" onclick="closeModal()">×</button></div><div id="modalBody" class="mt-4"></div></div></div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>

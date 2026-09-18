@@ -1,0 +1,10 @@
+# Varuna Netra - Marine Debris Sonar
+
+nc: 5
+
+names:
+  - crab_pot
+  - submarine_pipeline
+  - shipwreck
+  - ghost_net
+  - mine_cylinder

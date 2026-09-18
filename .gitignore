@@ -1,0 +1,36 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+.env
+
+runs/
+*.cache
+
+data/
+dataset/
+datasets/
+
+*.zip
+*.7z
+*.001
+*.002
+*.003
+*.004
+*.005
+*.006
+
+.vscode/
+
+static/uploads/*
+static/results/*
+
+# Python cache
+**/__pycache__/
+
+# Temporary files
+*.tmp
+*.log
+# Local SQLite database
+*.db
