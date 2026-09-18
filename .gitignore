@@ -34,3 +34,4 @@ static/results/*
 *.log
 # Local SQLite database
 *.db
+models/best_backup.pt
