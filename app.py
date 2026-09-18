@@ -15,7 +15,7 @@ from database import db, init_db, save_survey, Survey, Anomaly
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 RESULTS_FOLDER = os.path.join(BASE_DIR, "static", "results")
-MODEL_PATH = os.path.join(BASE_DIR, "models", "best.pt")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "best.torchscript")
 TEMPLATE_FOLDER = os.path.join(BASE_DIR, "templates")
 STATIC_FOLDER = os.path.join(BASE_DIR, "static")
 

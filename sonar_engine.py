@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 
 class SonarAnomalyEngine:
-    def __init__(self, model_path="models/best.pt", conf_thresh=0.40):
+    def __init__(self, model_path="models/best.torchscript", conf_thresh=0.40):
         # Always resolve model path relative to this file
         base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,7 +17,7 @@ class SonarAnomalyEngine:
         if not os.path.exists(abs_model_path):
             raise FileNotFoundError(
                 f"Model not found at: {abs_model_path}\n"
-                f"Put best.pt inside: {os.path.join(base_dir, 'models')}"
+                f"Put best.torchscript inside: {os.path.join(base_dir, 'models')}"
             )
 
         # Load trained YOLO model
