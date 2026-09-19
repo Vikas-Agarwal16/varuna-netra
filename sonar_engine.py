@@ -21,7 +21,7 @@ class SonarAnomalyEngine:
             )
 
         # Load trained YOLO model
-        self.model = YOLO(abs_model_path)
+        self.model = YOLO(abs_model_path, task="detect")
 
         self.conf = conf_thresh
         self.class_names = self.model.names
@@ -102,6 +102,7 @@ class SonarAnomalyEngine:
         results = self.model(
             denoised,
             conf=conf_val,
+            imgsz=320,
             verbose=False
         )[0]
 
