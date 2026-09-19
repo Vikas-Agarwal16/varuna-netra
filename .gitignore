@@ -35,3 +35,4 @@ static/results/*
 # Local SQLite database
 *.db
 models/best_backup.pt
+models/best_fused.pt
