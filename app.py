@@ -1383,10 +1383,14 @@ def download_json():
         start=1
     ):
 
-        bbox = (
-            d.get("bbox")
-            or {}
-        )
+        bbox = d.get("bbox") or []
+
+        # sonar_engine.py stores bounding boxes as:
+        # [x1, y1, x2, y2]
+        if isinstance(bbox, (list, tuple)) and len(bbox) >= 4:
+            x1, y1, x2, y2 = bbox[:4]
+        else:
+            x1 = y1 = x2 = y2 = None
 
         export_detections.append({
 
@@ -1463,17 +1467,10 @@ def download_json():
             },
 
             "bounding_box": {
-                "x1":
-                    bbox.get("x1"),
-
-                "y1":
-                    bbox.get("y1"),
-
-                "x2":
-                    bbox.get("x2"),
-
-                "y2":
-                    bbox.get("y2"),
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2,
             },
         })
 
@@ -1663,10 +1660,14 @@ def download_csv():
         start=1
     ):
 
-        bbox = (
-            d.get("bbox")
-            or {}
-        )
+        bbox = d.get("bbox") or []
+
+        # sonar_engine.py stores bounding boxes as:
+        # [x1, y1, x2, y2]
+        if isinstance(bbox, (list, tuple)) and len(bbox) >= 4:
+            x1, y1, x2, y2 = bbox[:4]
+        else:
+            x1 = y1 = x2 = y2 = None
 
         writer.writerow([
 
@@ -1734,21 +1735,10 @@ def download_csv():
                 "area_sq_m"
             ),
 
-            bbox.get(
-                "x1"
-            ),
-
-            bbox.get(
-                "y1"
-            ),
-
-            bbox.get(
-                "x2"
-            ),
-
-            bbox.get(
-                "y2"
-            ),
+            x1,
+            y1,
+            x2,
+            y2,
         ])
 
     return output.getvalue(), 200, {
